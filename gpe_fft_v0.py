@@ -19,7 +19,9 @@ import matplotlib.pyplot as plt
 from scipy.fftpack import fft, ifft
 from scipy.integrate import odeint
 import numpy.linalg as lin
-get_ipython().magic('matplotlib inline')
+#%matplotlib inline
+#from matplotlib import interactive
+#interactive(True)
 pi=np.pi
 
 
@@ -179,7 +181,6 @@ print("Energy change at last step  = %g"%(energy_cicle[Nstep,0]-energy_cicle[Nst
 # Plot convergence during the evolution in the average energy per particle
 
 # In[9]:
-
 plt.title('Convergence',fontsize=15)
 plt.xlabel('time ($t \, \\omega_{ho}$)',fontsize=15)
 plt.ylabel('Energy per particle ($E/\\hbar \,\\omega_{ho}$)',fontsize=15)
@@ -188,6 +189,8 @@ plt.xticks(np.arange(0, tevol[Nstep]+1,tevol[Nstep]/5))
 plt.locator_params('y',nbins=3)
 plt.plot(tevol, energy_cicle[:,0], 'r-')
 #plt.plot(z, psi, 'r.')
+plt.show()
+#raw_input('press return to continue')
 
 
 # Plot the final density (or wave function)
@@ -207,7 +210,8 @@ plt.locator_params('y',nbins=3)
 #plt.plot(z, psi.imag, 'b--',label='imag$(\psi)$')
 plt.plot(z, abs(psi)**2, 'b--',label='$|\psi|^2$') # plot density
 plt.legend(fontsize=15)
-
+plt.show()
+#raw_input('press return to continue')
 
 # In[ ]:
 
