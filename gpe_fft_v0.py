@@ -36,7 +36,12 @@ a_s=0.5; # scattering length
 whoz=1.0; # harmonic oscilator angular frequency
 #mu=3.27; #Chemical potential
 #Omega=pi/(2*Zmax); #reference frame velocity
-
+print("Initial data:")
+print(" Number of particles = %g"%(Nparticle))
+print(" Harmonic oscillator angular frequency = %g"%(whoz))
+print(" Domain half length = %g"%(Zmax))
+print(" Number of grid points = %g"%(Npoint))
+print(" Scattering length = %g"%(a_s))
 
 # Derived quantities
 
