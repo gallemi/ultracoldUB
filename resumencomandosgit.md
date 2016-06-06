@@ -31,7 +31,7 @@ nothing added to commit but untracked files present (use "git add" to track)
 
 ahora git ya lo ha añadido a mi repositorio local, dentro de la rama principal "origin/master"
 
-- git commit  -m "resumen comandos git"
+- <b>git commit</b>  -m "resumen comandos git"
 
 pone al dia el contenido de los ficheros que he modificado dentro de mi repositorio
 
