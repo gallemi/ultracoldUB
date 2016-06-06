@@ -29,4 +29,14 @@ nothing added to commit but untracked files present (use "git add" to track)
 
 - git add resumentcomandosgit.md
 
+ahora git ya lo ha añadido a mi repositorio local, dentro de la rama principal "origin/master"
+
+- git commit  -m "resumen comandos git"
+
+pone al dia el contenido de los ficheros que he modificado dentro de mi repositorio
+
+- git push 
+
+sube al repositorio remoto 
+
 
