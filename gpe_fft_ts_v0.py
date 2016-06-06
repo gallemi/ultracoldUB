@@ -1,4 +1,5 @@
 
+# prueba
 # coding: utf-8
 
 # ## FFT solver for 1D Gross-Pitaevski equation
