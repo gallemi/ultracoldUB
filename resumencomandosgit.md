@@ -39,4 +39,13 @@ pone al dia el contenido de los ficheros que he modificado dentro de mi reposito
 
 sube al repositorio remoto 
 
+---------------------------------
+tutoriales
+---------------------------------
+carla marin dixit, 
 
+Mira, este (acabo de descubrirlo) está bastante bien para familiarizaros con los comandos en la terminal, es básico pero incluye también branches y merges:
+https://try.github.io/levels/1/challenges/1
+
+Y para las opciones que tienes desde la web de github su propio tutorial que comentamos ayer también está muy bien:
+https://guides.github.com/activities/hello-world/
