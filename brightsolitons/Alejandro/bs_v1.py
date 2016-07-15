@@ -290,7 +290,7 @@ psi0 = changeFFTposition(cc0,Npoint,0)
 # In[11]:
 
 # parameters for the real time evolution
-psi_v = psi*exp(1j*v*z)        # giving a push to the eigenstate
+psi_v = psi*np.exp(1j*v*z)        # giving a push to the eigenstate
 c = fft(changeFFTposition(psi_v,Npoint,1))
 c = normaliza(c); # check norm in the wf
 c0=c
@@ -382,3 +382,4 @@ def animate(i):
 #animation object
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=20, blit=True)
 fig.show()
+plt.show()
