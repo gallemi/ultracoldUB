@@ -110,21 +110,23 @@ V = changeFFTposition(Vpot_R,Npoint,0) # physical order
 #  Evolve in time the initial state
 # ------------------------------------------------------------------------------
 
-# checks evolution with imaginary time (comment next line to ignore it)
-c = evolution(t0, -1j*Dti, z, c0, Vpot_R, V, Ekin_K, 1)
+# plots
+plots = 0 # plots wavefunctions and intermediate states if 0
 
-# animation and file writing (for real time evolution)
+# checks evolution with imaginary time (comment next line to ignore it)
+c = evolution(t0, -1j*Dti, z, c0, Vpot_R, V, Ekin_K, 1, plots)
+
+# file writing (for real time evolution)
 write_evolution = 1 # writes the wavefuntion at certain time steps if 0
-animate_evolution = 1 # shows an animation of the dynamic evolution if 0
 
 # initial kick to the soliton (velocity v)
-psi = psi *np.exp(+1j*(v/(2.0*Zmax))*(z-x0))
+psi = psi *np.exp(+1j*v*(z-x0))
 cc = changeFFTposition(psi,Npoint,1)
 c = fft( cc / (Npoint*NormWF**0.5)); c = normaliza(c,1); # check norm in the wf
 c0 = c # initial wavefunction for the dynamic evolution (used in the animation)
 
 # potential for the dynamic evolution
-Vpot_R = Vpot(0, z)
+Vpot_R = Vpot(2, z)
 
 # saves the initial wavefunction (psi**2) and potential on a file
 fv = open('initial2.dat', 'w')
@@ -137,43 +139,4 @@ V = changeFFTposition(Vpot_R,Npoint,0)
 
 # evolution
 t0=0.0
-c = evolution(t0, Dtr, z, c0, Vpot_R, V, Ekin_K, write_evolution)
-
-
-
-# Animation
-# ------------------------------------------------------------------------------
-
-if (animate_evolution == 0):
-
-    c = c0
-
-    #figure window
-    fig = plt.figure()
-    ax = plt.axes(xlim=(-Zmax, Zmax), ylim=(0, 0.3))
-    line, = ax.plot([], [], lw=2)
-
-    #base frame
-    def init():
-        line.set_data([], [])
-        plt.plot(z, abs(psi0)**2, 'r-',label='$|\psi_0|^2$') # plot initial density
-        plt.plot(z, V, 'g-') # plot the box
-        return line,
-
-    # animation function.  This is called sequentially
-    def animate(i):
-        global c
-        psi=ifft(T_K(Dtr, Ekin_K)*c)*Npoint
-        c=T_K(Dtr, Ekin_K)*fft(T_R_psi(t0,Dtr,psi,Vpot_R))/Npoint
-        c = normaliza(c,0); # check norm in the wf
-        #prepare to plot
-        cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
-        psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
-        # plot features
-        line.set_data(z, abs(psi)**2)
-        return line,
-
-    #animation object
-    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=20, blit=False)
-    fig.show()
-    plt.show()
+c = evolution(t0, Dtr, z, c0, Vpot_R, V, Ekin_K, write_evolution,plots)

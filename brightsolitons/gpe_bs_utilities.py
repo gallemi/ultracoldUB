@@ -40,26 +40,26 @@ def Vpot(n, z):
        Npoint  number of grid points
        whoz    harmonic oscillator frequency
        xb      position of the barrier
-       wb      halfwidth of the barrier
+       wb      width of the barrier
        hb      height of the barrier
        wall    height of the walls
     """
     global Zmax, Npoint, whoz, xb, wb, hb, wall
     Vpot_R = np.empty([Npoint]) # vector of the same length as z, initially empty
     m = 1000                    # slope used to define the walls and barrier
-    wall_x = 0.5*Zmax           # position of the walls relative to the halfwidth of the box
+    wall_x = 0.75*Zmax          # position of the walls relative to the halfwidth of the box
     # defines the walls of the box
     if wall != 0.0 :
         Vpot_R = wall - wall/(1.0+np.exp(m*(z-wall_x))) + wall/(1.0+np.exp(m*(z+wall_x)))
     else:
-        Vpot_R = 0.0
+        Vpot_R = 0.0*z
     # defines the potential (barriers, harmonic trap, etc.)
     if(n==0):
         Vpot_R = Vpot_R
     elif(n==1):
         Vpot_R = 0.5*whoz**2*z**2
     elif(n==2):
-        Vpot_R = Vpot_R + hb/(1.0+np.exp(m*(z-xb-wb))) - hb/(1.0+np.exp(m*(z-xb+wb)))
+        Vpot_R = Vpot_R + hb/(1.0+np.exp(m*(z-xb-wb*0.5))) - hb/(1.0+np.exp(m*(z-xb+wb*0.5)))
     else:
         Vpot_R = Vpot_R
     return Vpot_R
@@ -119,7 +119,7 @@ def T_R_psi(t, Dt, psi, Vpot_R):
 # Evolution
 # ------------------------------------------------------------------------------
 
-def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
+def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     """Calculates the evolution of the wavefunction c.
        t0         initial time
        Dt         time step (either imaginary or real)
@@ -129,6 +129,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
        V          external potential (physical order)
        Ekin_K     kinetic energy (FFT order)
        write_ev   writes data into files if 0
+       plots      plots data if 0
     Global variables:
        Ntime_out  number of time steps for intermediate outputs
        Ntime_fin  total number of time steps
@@ -142,7 +143,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
        v          initial velocity of the soliton
        whoz       harmonic oscillator frequency
        xb         position of the barrier
-       wb         halfwidth of the barrier
+       wb         width of the barrier
        hb         height of the barrier
        wall       height of the walls
     Returns the final wavefunction.
@@ -174,6 +175,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
         fn = open('normalization_imag.dat', 'w')
         fe = open('energies_imag.dat', 'w')
         fc = open('c_imag.dat', 'w')
+        fpsi_all = open('evolution_imag.dat', 'w')
     else:
         print "(Real time evolution)"
         fn = open('normalization_real.dat', 'w')
@@ -182,6 +184,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
         else:
             fe = open('energies_real.dat', 'w')
         fc = open('c_real.dat', 'w')
+        fpsi_all = open('evolution_real.dat', 'w')
 
     # wavefunction and counters
     Ninter = Ntime_fin//Ntime_out # number of outputs (intermediate states)
@@ -196,7 +199,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
     format_c = "%.2f \t %.12g \t %.12g \t %.12g \n"
     format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
     fe.write("# %s\t%s\t%s\t%s\t%s\t%s\n" %("time","total energy","chemical potential","kinetic energy","potential energy","interaction energy"))
-    header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, xb, 2*wb, hb, wall, energy_cicle[j,1], energy_cicle[j,0]
+    header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, xb, wb, hb, wall, energy_cicle[j,1], energy_cicle[j,0]
     header_format = "# %s"+("\t%s")*5+"\n" + "# Number of particle = %s; scattering length = %s; Grid width = %s; Number of points = %s; Total number of time steps = %s; time step = %s " + "initial position of the soliton = %s; initial velocity of the soliton = %s; position of the barrier = %s; width of the barrier = %s; height of the barrier = %s; height of the potential walls = %s" + " results: chemical potential = %s; total energy = %s \n"
     format_psi = "%.2f" + ("\t %.12g")*5 + "\n"
 
@@ -211,19 +214,24 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
     cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
     psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 
+    # state at t0
+    for k in range(0,Npoint-1):
+        fpsi_all.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k]))
+
     # plots initial state and prepares plot of intermediate states
-    f4=plt.figure()
-    if isinstance(Dt, complex):
-        plt.title('Evolution of the initial wavefunction (imaginary time)',fontsize=15)
-    else:
-        plt.title('Evolution of the initial wavefunction (real time)',fontsize=15)
-    plt.xlabel('$x/a_{ho}$',fontsize=15)
-    plt.xticks(np.arange(-Zmax, Zmax+1,Zmax/2))
-    plt.axis((-Zmax,Zmax,0,0.3))
-    plt.locator_params('y',nbins=3)
-    plt.plot(z, abs(psi)**2, 'r-',label='$|\psi_0|^2$')
-    plt.plot(z, changeFFTposition(Vpot_R,Npoint,0), 'g--',label='potential')
-    plt.legend(fontsize=15)
+    if(plots==0):
+        f4=plt.figure()
+        if isinstance(Dt, complex):
+            plt.title('Evolution of the initial wavefunction (imaginary time)',fontsize=15)
+        else:
+            plt.title('Evolution of the initial wavefunction (real time)',fontsize=15)
+        plt.xlabel('$x/a_{ho}$',fontsize=15)
+        plt.xticks(np.arange(-Zmax, Zmax+1,Zmax/2))
+        plt.axis((-Zmax,Zmax,0,0.3))
+        plt.locator_params('y',nbins=3)
+        plt.plot(z, abs(psi)**2, 'r-',label='$|\psi_0|^2$')
+        plt.plot(z, changeFFTposition(Vpot_R,Npoint,0), 'g--',label='potential')
+        plt.legend(fontsize=15)
 
     # writes initial state on the corresponding file
     if (write_ev==0):
@@ -248,11 +256,15 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
             if(not(i%100)):
                 cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
                 psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
-                if(not(i%500)):
-                    plt.plot(z, abs(psi)**2, 'b--',label='$|\psi|^2$') # plot density
-                    if(l==0):
-                        plt.legend(fontsize=15)
-                    l+=1
+                for k in range(0,Npoint-1): # al time steps in one file
+                    fpsi_all.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k]))
+                fpsi_all.write("\n \n")
+                if(plots==0):
+                    if(not(i%500)):
+                        plt.plot(z, abs(psi)**2, 'b--',label='$|\psi|^2$') # plot density
+                        if(l==0):
+                            plt.legend(fontsize=15)
+                        l+=1
                 if(write_ev==0):
                     fpsi = open('./%s/%s-%08d.dat' %(dir,name,tevol[j]*1000), 'w')
                     fpsi.write(header_format %(header_variables))
@@ -264,17 +276,19 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev):
     # prints final energies
     print("         final   = %g %g %g %g %g"%(Energy(c, Vpot_R, Ekin_K)))
     print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
-    f4.show(); plt.show()
+    print("  E(final) - E(initial) = %g"%(np.abs(energy_cicle[Ninter,0]-energy_cicle[0,0])))
+    if(plots==0):
+        f4.show(); plt.show()
 
     # plots energies
-    plot_convergence(tevol,energy_cicle[:,0],energy_cicle[:,1],energy_cicle[:,2],energy_cicle[:,3],energy_cicle[:,4],Ninter); plt.show()
-
-    # other plots (for the final state)
-    plot_phase(z,psi,Zmax,t); plt.show()
-    plot_real_imag(z,psi,Zmax,t); plt.show()
+    if(plots==0):
+        plot_convergence(tevol,energy_cicle[:,0],energy_cicle[:,1],energy_cicle[:,2],energy_cicle[:,3],energy_cicle[:,4],Ninter); plt.show()
+        # other plots (for the final state)
+        # plot_phase(z,psi,Zmax,t); plt.show()
+        # plot_real_imag(z,psi,Zmax,t); plt.show()
 
     # closes files
-    fn.close(); fe.close(); fc.close()
+    fn.close(); fe.close(); fc.close(); fpsi_all.close()
 
     return c
 
@@ -325,12 +339,12 @@ def plot_convergence(x,y0,y1,y2,y3,y4,n):
     plt.ylabel('Energy per particle ($E/\\hbar \,\\omega_{ho}$)',fontsize=15)
     plt.xticks(np.arange(0, x[n]+1,x[n]/5))
     plt.locator_params('y',nbins=3)
-    plt.plot(x, y0, 'r-',label="$E_{med}$")
-    plt.plot(x, y2, 'b-',label="$E_{kin}$")
-    plt.plot(x, y3, 'g-',label="$E_{pot}$")
-    plt.plot(x, y4, 'y-',label="$E_{int}$")
-    plt.plot(x, y1, 'm',label="$\\mu$")
-    plt.legend(fontsize=15)
+    plt.plot(x, y0, 'r-',label="$E_{med}$") # plot only average energy
+    # plt.plot(x, y2, 'b-',label="$E_{kin}$")
+    # plt.plot(x, y3, 'g-',label="$E_{pot}$")
+    # plt.plot(x, y4, 'y-',label="$E_{int}$")
+    # plt.plot(x, y1, 'm',label="$\\mu$")
+    # plt.legend(fontsize=15)
     f1.show()
 
 def plot_density(z,psi,Lz,t):
@@ -339,7 +353,7 @@ def plot_density(z,psi,Lz,t):
     plt.xlabel('$x/a_{ho}$',fontsize=15)
     plt.xticks(np.arange(-Lz, Lz+1,Lz/2))
     plt.locator_params('y',nbins=3)
-    plt.plot(z, abs(psi)**2, 'b--',label='$|\psi|^2$') # plot density
+    plt.plot(z, abs(psi)**2, 'b-',label='$|\psi|^2$') # plot density
     plt.legend(fontsize=15)
     f2.show()
 
