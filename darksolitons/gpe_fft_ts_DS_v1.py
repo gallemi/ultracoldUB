@@ -230,8 +230,14 @@ plot_real_imag(z,psi,Zmax,t)
 
 psi_sol=psi                  # we chance name variable
 # User decide the oscilation number
-osci =raw_input('introduce el numero de oscilaciones que quieres que de el soliton')
+osci =raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 0 y 10')
 osci=float(osci)
+while ((osci<0) or (osci>10)):
+    print "ERROR: las oscilaciones deben de estar entre un rango de 0 y 10"
+    osci=raw_input("introduce el numero de oscilaciones que quieres que de el soliton")
+    osci=float(osci)
+    
+    
 Ntime_fin=int(osci*8800)     # total number of time steps
 Ntime_out = 100              # number of time steps for intermediate outputs
 Dtr=1.0e-3                   # real time step
@@ -272,6 +278,7 @@ file3=open('min.txt','w')
 file3.write('Tabla donde se representan la posición del mínimo del solitón y su valor asociado en función del tiempo.\n')
 file3.write('Tiempo\tPosición del mínimo\tValor del mínimo\n')
 
+file2=open('WfDs.txt','w')
 f4=plt.figure()
 for i in range(1, Ntime_fin+1): # time evolution cicle
     t += Dt.real
@@ -305,12 +312,12 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         
         
 # Write wave function        
-        file2=open('WfDs-%08d.txt'%(t*1000),'w')
-        file2.write('Datos de interés: N.partículas=%g\tPar.Interacción=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quím.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
-        file2.write('x\tDensidad\tFase\tRe\tIm\tV(x)\n')
+#        file2=open('WfDs-%08d.txt'%(t*1000),'w')
+#        file2.write('Datos de interés: N.partículas=%g\tPar.Interacción=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quím.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
+#        file2.write('x\tDensidad\tFase\tRe\tIm\tV(x)\n')
         for i in range (0,int(2*Zmax/Dz)):
             file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(Vpot_R,Npoint,0)[i]))
-
+        file2.write('\n\n')
 
 # Minus of density (soliton) 
         point= x0/Dz
