@@ -50,6 +50,24 @@ def changeFFTposition(f,N,j):  # change the order in vectors from FFT
     else:
         print("error in changeFFTposition(f,N,j): j must be 0 or 1...")
     return f1
+    
+
+#integral
+def integral(x,dx,z,i,f):
+# x is a function (vecgtor)
+# dx is the length step size
+# z is the grid
+# i is the initial piont
+# f is the last point
+    k = 0
+    if len(x) != len(z):
+        print "Error: the function has not the same length as the grid"
+    inte = 0.0
+    for j in z:
+        if j>=i and j<=f:
+            inte += x[k]*dx
+        k += 1
+    return inte
 
 
 # Plot functions:
@@ -111,3 +129,19 @@ def plot_real_imag(z,psi,Lz,t):
     plt.plot(z, psi.imag, 'b--',label='imag$(\psi)$')
     plt.legend(fontsize=15)
     f3.show()    
+    
+# In[ ]:
+
+def plot_wave_function(x,y,n):
+    f4=plt.figure()
+    plt.title('Wave Function %',fontsize=15)
+    plt.xlabel('time ($t \, \\omega_{ho}$)',fontsize=15)
+    plt.ylabel('%',fontsize=15)
+    #plt.axis([-Zmax,Zmax,0, 8])
+    #plt.xticks(np.arange(0, x[n]+1,x[n]/3))
+    #plt.locator_params('y',nbins=3)
+    plt.plot(x, y[:,0], 'r-', label='left side')
+    plt.plot(x, y[:,1], 'g-', label='inside')
+    plt.plot(x, y[:,2], 'b-', label='right side')
+    plt.legend(fontsize=15)
+    f4.show()
