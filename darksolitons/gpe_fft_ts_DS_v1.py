@@ -42,7 +42,9 @@ import matplotlib.pyplot as plt
 from scipy.fftpack import fft, ifft
 from gpe_fft_utilities import * # local folder utilities
 import numpy.linalg as lin
+from pylab import* 
 
+close('all')
 pi=np.pi
 
 
@@ -230,10 +232,10 @@ plot_real_imag(z,psi,Zmax,t)
 
 psi_sol=psi                  # we chance name variable
 # User decide the oscilation number
-osci =raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 0 y 10')
+osci =raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 1 y 10')
 osci=float(osci)
-while ((osci<0) or (osci>10)):
-    print "ERROR: las oscilaciones deben de estar entre un rango de 0 y 10"
+while ((osci<1) or (osci>10)):
+    print "ERROR: las oscilaciones deben de estar entre un rango de 1 y 10"
     osci=raw_input("introduce el numero de oscilaciones que quieres que de el soliton")
     osci=float(osci)
     
@@ -257,7 +259,7 @@ c0=normaliza(fft(psi_sol)/Npoint) # initial wave function
 print("Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint")
 print("         initial = %g %g %g %g %g"%(Energy(c0)))
 
-# evolve in time: parameters
+# evolution in time: parameters
 t0=0.0
 c=c0
 tevol[0]=t0
@@ -271,14 +273,19 @@ energi=np.empty([5])           # put the energies in a vector
 
 # Open files
 file=open('energies.txt','w')
-file.write('Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del solitón.\n')
-file.write('Tiempo\tEnergía media\tPotencial químico\tEnergía cinética\tEnergía potencial\tEnergía interna\n' )
+file.write('Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del soliton.\n')
+file.write('Tiempo\tEnergia media\tPotencial quimico\tEnergia cinetica\tEnergia potencial\tEnergia interna\n' )
 
 file3=open('min.txt','w')
-file3.write('Tabla donde se representan la posición del mínimo del solitón y su valor asociado en función del tiempo.\n')
-file3.write('Tiempo\tPosición del mínimo\tValor del mínimo\n')
+file3.write('Tabla donde se representan la posicion del minimo del soliton y su valor asociado en funcion del tiempo.\n')
+file3.write('Tiempo\tPosicion del minimo\tValor del minimo\n')
 
-file2=open('WfDs.txt','w')
+#file2=open('WfDs.txt','w')
+#file2.write('Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
+#file2.write('x\tDensidad\tFase\tRe\tIm\tV(x)\n')
+
+file4=open('phase.txt','w')
+
 f4=plt.figure()
 for i in range(1, Ntime_fin+1): # time evolution cicle
     t += Dt.real
@@ -307,40 +314,47 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        plt.plot(z, psi.imag, 'b--',label='imag$(\psi)$')
 #        plt.plot(z, np.angle(psi), 'b.',label='$Arg(\psi)$')
         f4.show()
-        
+        psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
       
-        
-        
-# Write wave function        
-#        file2=open('WfDs-%08d.txt'%(t*1000),'w')
-#        file2.write('Datos de interés: N.partículas=%g\tPar.Interacción=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quím.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
-#        file2.write('x\tDensidad\tFase\tRe\tIm\tV(x)\n')
+
+# Writes wave function        
+        file2=open('WfDs-%08d.txt'%(j),'w')
+        file2.write('Tiempo=%s\n' %(t))
+        file2.write('Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
+        file2.write('x\tDensidad\tFase\tRe\tIm\tV(x)\n')
         for i in range (0,int(2*Zmax/Dz)):
             file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(Vpot_R,Npoint,0)[i]))
-        file2.write('\n\n')
+#        file2.write('\n\n')
+        
 
 # Minus of density (soliton) 
         point= x0/Dz
         rang=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
+        rang_2=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
+        
         for i in range(len(z)):
             if (i>(int((Npoint/2)-point-16)) and i<(int((Npoint/2)+point+16))):
                 rang[i-int((Npoint/2)-point-15)]=str((abs(psi)**2)[i])
     
         for i in range(len(rang)):
             if (min(rang)==rang[i]):
-# Save in a vector minus position/value and write in a file.
+# Saves in a vector minus position/value and writes in a file. Also, writes the difference phase that creates soliton.
                 j+=0
                 pos_minus[j]=z[i+int((Npoint/2)-point-15)]
+                dif_phase=np.angle(psi[i+int((Npoint/2)-point)])-np.angle(psi[i+int((Npoint/2)-point-30)])
                 val_minus[j]=min(rang)
                 file3.write('%s\t%s\t%s\n' %(t,pos_minus[j],val_minus[j]))
+                file4.write('%s\t%s\n' %(t,dif_phase))
+        
 file.close()    
 file2.close()                
-file3.close()   
+file3.close()
+file4.close()   
 
-# Print final energy (soliton)        
+# Prints final energy (soliton)        
 print("         final = %g %g %g %g %g"%(Energy(c)))           
 
-# Plot minus position and value           
+# Plots minus position and value           
 f5=plt.figure()
 plt.title('Minus position/value',fontsize=15)
 plt.xlabel('$t$',fontsize=15)
