@@ -52,13 +52,13 @@ import matplotlib.animation as animation
 
 # In[2]:
 
-Zmax = 2.0**6      # Grid half length
+Zmax = 2.0**7      # Grid half length
 Npoint = 2**10     # Number of grid points - better if power of 2 
 Nparticle = 20   # Number of particles
 a_s = -0.01        # scattering length
-x0 = -10.0            #soliton initial position
+x0 = -30.0            #soliton initial position
 v0 = 0.0            #initial velocity
-v = 3.0           #inital push
+v = 10.0           #inital push
 Omega = 0* pi/(2*Zmax)    # reference frame velocity
 Ntime_fin = 20000       # total number of time steps
 Ntime_out = 100       # number of time steps for intermediate outputs
@@ -69,7 +69,6 @@ Dti = 1.0e-3*100           # imaginary time step
 #
 print("Initial data:")
 print(" Number of particles = %g"%(Nparticle))
-#print(" Harmonic oscillator angular frequency = %g"%(whoz))
 print(" Domain half length = %g"%(Zmax))
 print(" Number of grid points = %g"%(Npoint))
 print(" Scattering length = %g"%(a_s))
@@ -97,12 +96,14 @@ Ninter = Ntime_fin//Ntime_out # Number of outputs with the intermediate states
 print(" Characteristic interaction energy = %g"%(gn))
 
 # Potential parameters
-ww = 0.9*Zmax        # walls width at a %1 of the grid
-wh = 100.0               #walls height
+ww = 0.75*Zmax        # walls width at a %1 of the grid
+wh = 0.0               #walls height
 bx = 0.0*Zmax       #barrier position a %1 of the grid
-bw = 1.0*xi          #barrier width a %1 of the healing leangth
+bw = 1*xi          #barrier width a %1 of the healing leangth
+bl = bx-bw*0.5      #barrier left wall
+br = bx+bw*0.5      #barrier right wall
 bh = 0.0            #initial barrier heigh  
-a = 0.0             #final barrier factor a*Energy 
+a = 0.5             #final barrier factor a*Energy 
 who = 0.0       # harmonic oscilator angular frequency          
 
 # Grid definitions: physical and momentum space
@@ -145,7 +146,7 @@ def potencial(bh):
     m = 1000
     Vpot = 0.0
     Vpot = wh-wh/(1+np.exp(m*(z-ww)))+wh/(1+np.exp(m*(z+ww)))    
-    Vbar = bh/(1+np.exp(m*(z-(bx+bw/2))))-bh/(1+np.exp(m*(z-(bx-bw/2))))
+    Vbar = bh/(1+np.exp(m*(z-br)))-bh/(1+np.exp(m*(z-bl)))
     Vho = 0.5*who**2*z**2
     Vpot=Vpot+Vbar+Vho
     return Vpot
@@ -178,6 +179,11 @@ def T_R_psi(t,Dt,psi): # Action of the time evolution operator over state c in R
     #
     return np.exp( -1j*Dt*(Vpot_R + gint*(abs(psi)**2)) )*psi    # return action on psi
 
+def Integral(x):
+    ileft = integral(x,Dz,z,-Zmax,bl)
+    iin = integral(x,Dz,z,bl,br)
+    iright = integral(x,Dz,z,br,Zmax)
+    return ileft, iin, iright
 
 # Choose initial state (wave function)
 # ---------------------------------------------------------------------------------------
@@ -215,9 +221,10 @@ tevol[0]=t0
 j=0
 t=0
 
-f3 = plt.figure()
+#f3 = plt.figure()
 cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
 psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+
 plt.plot(z, abs(psi)**2, 'r-',label='$|\psi|^2$') # plot initial density
 plt.plot(z, potencial(bh), 'g-') # plot the box
 
@@ -247,7 +254,7 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
             #plt.plot(z, psi.imag, 'b--',label='imag$(\psi)$')
             plt.plot(z, abs(psi)**2, 'b--',label='$|\psi|^2$') # plot density
             #plt.legend(fontsize=15)
-            f3.show()        
+           #f3.show()        
             
 print("         final   = %g %g %g %g %g"%(Energy(c))) # check energies
 print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
@@ -259,7 +266,6 @@ print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ni
 # In[9]:
 
 plot_convergence(tevol,energy_cicle[:,0],Ninter) # convergence in the average energy per particle
-
 
 # Plot the final density (or wave function)
 #  ---------------------------------------------------------------------------------------
@@ -310,6 +316,10 @@ t=0
 f4 = plt.figure()
 cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
 psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+
+wave_function = np.empty([Ninter+1,3]) # put the % of the wf in a matrix
+wave_function[0,:] = Integral(abs(psi)**2) # % at t=0
+
 plt.plot(z, abs(psi)**2, 'r-',label='$|\psi|^2$') # plot initial density
 plt.plot(z, potencial(bh), 'g-') # plot the box
 
@@ -322,11 +332,16 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         j+=1
         tevol[j] = t
         energy_cicle[j,:] = Energy(c)
+        cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
+        psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+        wave_function[j,:] = Integral(abs(psi)**2)  
+        #print(wave_function[j,:])
         
         if(not(j%10)):
             #prepare to plot
-            cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
-            psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+        # comment next 2 lines if already done
+#            cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
+#            psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
             # plot features
             
             plt.title('Real Time evolution'%(tevol[Ninter]),fontsize=15)
@@ -345,6 +360,7 @@ print("         final   = %g %g %g %g %g"%(Energy(c))) # check energies
 print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
 
 plot_convergence(tevol,energy_cicle[:,0],Ninter) # convergence in the average energy per particle
+plot_wave_function(tevol, wave_function, Ninter) # % in time
 
 
 #  Animation
@@ -382,4 +398,8 @@ def animate(i):
 #animation object
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=20, blit=True)
 fig.show()
+<<<<<<< HEAD
 plt.show()
+=======
+
+>>>>>>> 80049ec48852d66c2793878b38d97e5d9af0c2f8
