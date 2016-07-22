@@ -398,8 +398,4 @@ def animate(i):
 #animation object
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=20, blit=True)
 fig.show()
-<<<<<<< HEAD
 plt.show()
-=======
-
->>>>>>> 80049ec48852d66c2793878b38d97e5d9af0c2f8
