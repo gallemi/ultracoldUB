@@ -39,7 +39,7 @@ from scipy.integrate import odeint
 from gpe_fft_utilities import * # local folder utilities
 from wave_functions import * # local folder initial states
 # comment next line to export as a python shell 
-get_ipython().magic('matplotlib inline')
+#get_ipython().magic('matplotlib inline')
 pi=np.pi
 
 
@@ -80,7 +80,7 @@ print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
 
 NormWF = 1.0/(2*Zmax)           # Wave function (WF) norm
 gint = 2*a_s*Nparticle*NormWF   # interaction (nonlinear-term) strength
-Dz = 2*Zmax/Npoint              # length step size
+Dz = 2*Zmax*1./Npoint              # length step size
 Dk = pi/Zmax            # momentum step size
 Kmax = Dk*(Npoint//2)   # maximum momentum
 Dt = Dtr-1j*Dti         # complex time
@@ -92,6 +92,7 @@ print(" Characteristic interaction energy = %g"%(gint))
 # ---------------------------------------------------------------------------------------
 
 # In[4]:
+print("dz = %g"%(Dz))
 
 z = np.arange(-Zmax+Dz,Zmax+Dz,Dz) # physical (R-space) grid points in ascending order
 # zp=[(0:Dz:Zmax) (-(Zmax-Dz):Dz:-Dz)]; 
