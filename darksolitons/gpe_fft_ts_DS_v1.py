@@ -370,7 +370,7 @@ plt.plot(tevol,pos_minus, 'r--',label='$position-minus$') # plot minus position
 plt.plot(tevol,val_minus*100.0, 'b--',label='$value-minus$') # plot minus value
 plt.legend(fontsize=15)
 f5.show()
-         
+plt.show()         
 
 
 
