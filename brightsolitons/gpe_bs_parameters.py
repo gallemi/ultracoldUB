@@ -6,16 +6,16 @@ pi=np.pi
 # Data block
 # ------------------------------------------------------------------------------
 
-Zmax = 2.0**6               # Grid half length
-Npoint = 2**10              # Number of grid points (min. 2**8)
-Nparticle = 20              # Number of particles
-a_s = -0.02                 # scattering length (cases: -0.005, -0.01, -0.02)
-whoz = 0.01                 # harmonic oscilator angular frequency
-Omega = 0 * pi/(2*Zmax)     # reference frame velocity
-Ntime_out = 20              # number of time steps for intermediate outputs
-Dtr = 1.0e-3                # real time step (min. 1.0e-2)
-Dti = 1.0e-1                # imaginary time step
-Ntime_fin = int(50/Dtr)     # total number of time steps
+Zmax = 2.0**7                       # Grid half length
+Npoint = 2**10                      # Number of grid points (min. 2**8)
+Nparticle = 20e+3                   # Number of particles
+a_s = -0.01e-3                      # scattering length (cases: -0.005, -0.01, -0.02)
+whoz = 0.01                         # harmonic oscilator angular frequency
+Ntime_out = 20                      # number of time steps for intermediate outputs
+Dtr = 1.0e-3                        # real time step (min. 1.0e-2)
+Dti = 1.0e-1                        # imaginary time step
+time_final = 20.0                   # final time
+Ntime_fin = int(time_final/Dtr)     # total number of time steps
 
 
 # Derived quantities and parameters of the initial wavefunction (bright soliton)
@@ -30,8 +30,8 @@ Ninter = Ntime_fin//Ntime_out       # Number of outputs with the intermediate st
 gn = 2*a_s*Nparticle                # interaction (nonlinear-term) strength
 gint = gn*NormWF                    # int. strenght, with factor NormWF
 xi = 1.0/(np.abs(gn)**2*0.5)**0.5   # healing length
-x0 = -30.0                          # initial position of the soliton
-v = +5.0                            # initial velocity of the soliton (from 0 to 10)
+x0 = -50.0                          # initial position of the soliton
+v = +6.0                            # initial velocity of the soliton (from 0 to 10)
 
 
 # Potential walls and barrier
@@ -46,7 +46,10 @@ def height_barrier(a):
     height = a * v**2 * 0.5
     return height
 
-xb = 0.3*Zmax                       # position of the potential barrier
-hb = height_barrier(1.2)              # height of the potential barrier
+xb = 0.0*Zmax                       # position of the potential barrier
+hb = height_barrier(0.5)            # height of the potential barrier
 wb = 0.5 * xi                       # width of the potential barrier
-wall = 0.0 #100.0                   # height of the walls of the box
+wall_h = 100.0                      # height of the walls, fixed
+wall = 0                            # defines the walls of the box if not 0
+xbr = xb + 0.5*wb                   # position of the right wall (barrier)
+xbl = xb - 0.5*wb                   # positon of the left wall (barrier)
