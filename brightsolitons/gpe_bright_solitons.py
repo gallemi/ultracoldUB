@@ -104,7 +104,7 @@ plots = 0
 # c = evolution(t0, -1j*Dti, z, c0, Vpot_R, V, Ekin_K, 1, plots)
 
 # writes files with the wavefuntion at certain time steps if 0
-write_evolution = 1
+write_evolution = 0
 
 # initial kick to the soliton (velocity v)
 psi = psi *np.exp(+1j*v*(z-x0))

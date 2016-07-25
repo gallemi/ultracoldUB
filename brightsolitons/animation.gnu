@@ -10,8 +10,8 @@ set ylabel "|psi|^2"
 set title sprintf("Bright soliton (v=%.1f, gn=%.1f, h/E=%.1f, w/xi=%.1f)", v, gn, h, w)
 
 plot "evolution_real.dat" u 1:2 index i with lines title "|psi(x)|^2",\
-     "initial2.dat" using 1:2 with line title "potential",\
-     "initial2.dat" using 1:3 with line title "initial state"
+     "initial.dat" using 1:2 with line title "potential",\
+     "initial.dat" using 1:3 with line title "initial state"
 
 i=1+i
 pause 0.005
