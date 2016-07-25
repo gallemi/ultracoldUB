@@ -286,7 +286,7 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         for i in range (0,int(2*Zmax/Dz)):
             file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(abs(c)**2,Npoint,0)[i]))
         
-
+plt.show()
 file.close()       
 file2.close()
 # Prints final energy        
