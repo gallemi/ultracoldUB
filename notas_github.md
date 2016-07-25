@@ -13,12 +13,8 @@
 
       $ git status
       $ git add
-      $ git commit
+      $ git commit -m "mensaje"
       $ git push origin master
       $ git status  # para verificar
 
 - El pull request se puede hacer desde la web.
-
-**Notas:**
-- Para guardar y salir del editor vim: `Esc shift+Z shift+Z`.
-- No tengo muy clara la utilidad de las branchs cuando tu repositorio es un fork de otro.
