@@ -66,12 +66,15 @@ Dti = 1.0e-3             # imaginary time step
 
 # We choose the initial position of soliton:
 
-x0=raw_input("introduce posicion inicial del soliton de 0 a 6")
-x0=float(x0)
-while (np.abs(x0)>(6)): # tolerance for the initial position of the soliton
-    print "ERROR: el soliton debe estar dentro del rango de 0 a 6"
-    x0=raw_input("introduce posicion inicial del soliton")
-    x0=float(x0)
+while True:
+    try:
+        x0=float(raw_input("introduce posicion inicial del soliton de 0 a 6"))
+        while (np.abs(x0)>(6)): # tolerance for the initial position of the soliton
+            print "ERROR: el soliton debe estar dentro del rango de 0 a 6"
+            x0=float(raw_input("introduce posicion inicial del soliton"))
+        break
+    except ValueError:
+        print("Escribe un numero")
 
 # Print evolution data:
 
@@ -232,12 +235,15 @@ plot_real_imag(z,psi,Zmax,t)
 
 psi_sol=psi                  # we chance name variable
 # User decide the oscilation number
-osci =raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 1 y 10')
-osci=float(osci)
-while ((osci<1) or (osci>10)):
-    print "ERROR: las oscilaciones deben de estar entre un rango de 1 y 10"
-    osci=raw_input("introduce el numero de oscilaciones que quieres que de el soliton")
-    osci=float(osci)
+while True:
+    try:
+        osci =float(raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 1 y 10'))
+        while ((osci<1) or (osci>10)):
+            print "ERROR: las oscilaciones deben de estar entre un rango de 1 y 10"
+            osci=float(raw_input("introduce el numero de oscilaciones que quieres que de el soliton"))
+        break
+    except ValueError:
+        print("Escribe un numero")
     
     
 Ntime_fin=int(osci*8800)     # total number of time steps
