@@ -3,7 +3,7 @@ gn = -0.4
 h = 1.2
 w = 0.5 
 
-set xrange[-64:64]
+set xrange[-128:128]
 set yrange[-0:0.3]
 set xlabel "x"
 set ylabel "|psi|^2"
