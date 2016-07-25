@@ -54,12 +54,15 @@ pi=np.pi
 # In[2]:
 
 # User decides the time
-osci =raw_input('introduce el numero de unidades de tiempo que dura la simulacion entre 1 y 10')
-osci=float(osci)
-while ((osci<1) or (osci>10)):
-    print "ERROR: la simulacion debe de estar entre un rango de 1 y 10"
-    osci=raw_input("introduce el numero de unidades de tiempo que dure la simulacion")
-    osci=float(osci)
+while True:
+    try:
+        osci =float(raw_input('introduce el numero de unidades de tiempo que dura la simulacion entre 1 y 10'))
+        while ((osci<1) or (osci>10)):
+            print "ERROR: la simulacion debe de estar entre un rango de 1 y 10"
+            osci=float(raw_input("introduce el numero de unidades de tiempo que dure la simulacion"))
+        break
+    except ValueError:
+        print("Escribe un numero")
 
 Zmax = 50.0              # Grid half length
 Npoint =512              # Number of grid points
@@ -67,12 +70,15 @@ Nparticle = 500          # Number of particles
 a_s = 0.0                # scattering length 
 
 # User decides the type of movement (free movement or harm. osc.)
-harm=raw_input('introduce si quieres movimiento oscilatorio harmonico o no (1=si ; 0=no)')
-harm=float(harm)
-while (harm != 1 and harm!=0):
-    print 'ERROR: introduce 0 o 1'
-    harm=raw_input('introduce 1 o 0')
-    harm=float(harm)
+while True:
+    try:
+        harm=float(raw_input('introduce si quieres movimiento oscilatorio harmonico o no (1=si ; 0=no)'))
+        while (harm != 1 and harm!=0):
+            print 'ERROR: introduce 0 o 1'
+            harm=float(raw_input('introduce 1 o 0'))
+        break
+    except ValueError:
+        print ("Escoge las opciones que se te han dado")
     
 if (harm==1):
     whoz = 1.0               # harmonic oscilator angular frequency
@@ -87,12 +93,15 @@ Ntime_out = 100              # number of time steps for intermediate outputs
 
 # We choose the initial position of wave pack:
 
-x0=raw_input("introduce posicion inicial del paquete de 0 a 5")
-x0=float(x0)
-while (np.abs(x0)>(5)): # tolerance for the initial position of the soliton
-    print "ERROR: la posicion inicial del paquete debe estar dentro del rango de 0 a 5"
-    x0=raw_input("introduce posicion inicial del soliton")
-    x0=float(x0)
+while True:
+    try:
+        x0=float(raw_input("introduce posicion inicial del paquete de 0 a 5"))
+        while (np.abs(x0)>(5)): # tolerance for the initial position of the soliton
+            print "ERROR: la posicion inicial del paquete debe estar dentro del rango de 0 a 5"
+            x0=float(raw_input("introduce posicion inicial del soliton"))
+        break
+    except ValueError:
+        print ("Escoge un numero")
 
 # Print evolution data:
 
