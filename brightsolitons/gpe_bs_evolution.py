@@ -6,6 +6,7 @@ import os, glob
 from gpe_bs_parameters import *
 from gpe_bs_plots import *
 from gpe_bs_utilities import *
+import sys
 
 
 # Evolution
@@ -55,8 +56,21 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         if (not os.path.exists(dir)): # creates the directory
             os.makedirs(dir)
         else: # removes its contents if it already exists
-            print "Directory %r already exists..." % (dir)
-            raw_input(" ") # pause, any input will work
+            print "Directory %r already exists." % (dir)
+            while True:
+                try:
+                    ans = str(raw_input("\t Do you want to continue? (Y/N): ")) # pause, answer to continue
+                except ValueError:
+                    continue
+                else:
+                    if (ans!='Y' and ans!='y' and ans!='N' and ans!='n'):
+                        continue
+                    else:
+                        break
+            if (ans == 'N' or ans == 'n'):
+                sys.exit("End of program")            
+                
+            
             files = "%s/%s_*.dat" % (dir, name)
             for f in glob.glob(files):
                 os.remove( f )
@@ -89,7 +103,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     wave_function = np.empty([Ninter+1,3])
 
     # headers and formats for files
-    format_c = "%.2f \t %.12g \t %.12g \t %.12g \n"
     format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
     fe.write("# %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %("time","total energy","chemical potential","kinetic energy","potential energy","interaction energy", "left integral", "inside integral", "right integral"))
     header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, xb, wb, hb, energy_cicle[j,1], energy_cicle[j,0]
@@ -141,7 +154,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         t += np.abs(Dt)
         psi=ifft(T_K(Dt, Ekin_K)*c)*Npoint
         c=T_K(Dt, Ekin_K)*fft(T_R_psi(t0,Dt,psi,Vpot_R))/Npoint
-        #fc.write(format_c % (t , np.abs(c[int(Npoint/2-0.1*Npoint)]) , np.abs(c[int(Npoint/2)]) , np.abs(c[int(Npoint/2+0.1*Npoint)]))) # write some values of c on a file
         c = normaliza(c,fn); # check norm in the wf
         V = changeFFTposition(Vpot_R,Npoint,0) # in physical order
 
@@ -189,7 +201,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     if(plots==0):
         plot_convergence(tevol,energy_cicle,Ninter); plt.show()
         # other plots (for the final state)
-        # plot_phase(z,psi,Zmax,t); plt.show()
+        # plot_phase(z,psi,Zmax,t); plt.show()
         # plot_real_imag(z,psi,Zmax,t); plt.show()
         plot_wave_function(tevol, wave_function); plt.show()
 

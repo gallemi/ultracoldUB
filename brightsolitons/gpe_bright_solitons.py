@@ -29,6 +29,7 @@
 # ------------------------------------------------------------------------------
 
 import numpy as np
+import time
 
 from scipy.fftpack import fft, ifft
 from gpe_bs_utilities import *
@@ -36,6 +37,8 @@ from gpe_bs_parameters import *
 from gpe_bs_evolution import *
 pi=np.pi
 
+
+start = time.time()
 
 # Print data block
 # ------------------------------------------------------------------------------
@@ -57,7 +60,7 @@ print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
 
 print("\nInitial wavefunction parameters:")
 print(" Characteristic interaction energy = %g"%(gint/NormWF))
-print(" Healing length = %g \t %g" %(xi, 1.0 / ( np.abs(gn)**2 * 0.5   )**0.5))
+print(" Healing length = %g" %(xi))
 print(" Position of the soliton = %g"%(x0))
 if wall != 0:
     print(" Height of the walls = %g"%(wall_h))
@@ -126,3 +129,7 @@ Vpot_R = changeFFTposition(Vpot_R,Npoint,1) # K3
 # evolution (real time)
 t0=0.0
 c = evolution(t0, Dtr, z, c0, Vpot_R, V, Ekin_K, write_evolution,plots)
+
+end = time.time()
+
+print("Time: %g"%(end - start))
