@@ -29,6 +29,8 @@
 # ------------------------------------------------------------------------------
 
 import numpy as np
+import os
+import subprocess
 
 from scipy.fftpack import fft, ifft
 from gpe_bs_utilities import *
@@ -112,7 +114,7 @@ if do_plt == "Y" or do_plt == "y":
 elif do_plt == "N" or do_plt == "n":
     plots = 1
 
-# writes files with the wavefuntion at certain time steps if 0
+# writes files with the wavefuntion at certain time steps
 print("Write files with the wavefunction at certain time steps?")
 while True:
     try:
@@ -129,6 +131,24 @@ if do_file == "Y" or do_file == "y":
     write_evolution = 0
 elif do_file == "N" or do_file == "n":
     write_evolution = 1
+
+# plots animation of the evolution
+print("Do an animation of the evolution?")
+while True:
+    try:
+        do_anim = str(raw_input("\tY/N: "))
+    except ValueError:
+        continue
+    else:
+        if do_anim != "Y" and do_anim != "N" and do_anim != "y" and do_anim != "n":
+            continue
+        else:
+            break
+
+if do_anim == "Y" or do_anim == "y":
+    anim_gif = 0
+elif do_anim == "N" or do_anim == "n":
+    anim_gif = 1
 
 
 
@@ -158,3 +178,8 @@ Vpot_R = changeFFTposition(Vpot_R,Npoint,1) # K3
 # evolution (real time)
 t0=0.0
 c = evolution(t0, Dtr, z, c0, Vpot_R, V, Ekin_K, write_evolution,plots)
+
+if anim_gif == 0:
+    p = subprocess.Popen("gnuplot animation_gif.gnu", shell = True)
+    os.waitpid(p.pid, 0)
+    print("Animation 'bright_soliton.gif' has been created in the current directory.")

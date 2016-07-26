@@ -36,7 +36,10 @@
 
       $ git push origin [name_of_your_new_branch]
 
-- Hacer un pull request con los cambios.
+- Hacer un pull request con los cambios (desde la web).
+
+-----------------------------------
+
 - Volver a actualizar el repositorio local y eliminar la rama (local):
 
       $ git pull upstream master
