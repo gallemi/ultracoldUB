@@ -30,6 +30,8 @@
 
 import numpy as np
 import time
+import os
+import subprocess
 
 from scipy.fftpack import fft, ifft
 from gpe_bs_utilities import *
@@ -70,7 +72,6 @@ if hb != 0.0:
     print(" Width of the potential barrier = %g" %(wb*2.0))
 print(" Initial velocity of the soliton = %g \n" %(v))
 
-
 # Grid definitions: physical and momentum space; kinetic energy in K space
 # ------------------------------------------------------------------------------
 
@@ -92,22 +93,73 @@ psi = changeFFTposition(ifft(c)*Npoint*NormWF**0.5,Npoint,1)
 psi0 = psi
 
 # initial potential
-Vpot_R = Vpot(2, z)
+Vpot_R = Vpot(V_ext, z)
 
+
+# plots and files
+# ------------------------------------------------------------------------------
+
+# plots
+print("Plot wavefunctions and intermediate states?")
+while True:
+    try:
+        do_plt = str(raw_input("\tY/N: "))
+    except ValueError:
+        continue
+    else:
+        if do_plt != "Y" and do_plt != "N" and do_plt != "y" and do_plt != "n":
+            continue
+        else:
+            break
+
+if do_plt == "Y" or do_plt == "y":
+    plots = 0
+elif do_plt == "N" or do_plt == "n":
+    plots = 1
+
+# writes files with the wavefuntion at certain time steps
+print("Write files with the wavefunction at certain time steps?")
+while True:
+    try:
+        do_file = str(raw_input("\tY/N: "))
+    except ValueError:
+        continue
+    else:
+        if do_file != "Y" and do_file != "N" and do_file != "y" and do_file != "n":
+            continue
+        else:
+            break
+
+if do_file == "Y" or do_file == "y":
+    write_evolution = 0
+elif do_file == "N" or do_file == "n":
+    write_evolution = 1
+
+# plots animation of the evolution
+print("Do an animation of the evolution?")
+while True:
+    try:
+        do_anim = str(raw_input("\tY/N: "))
+    except ValueError:
+        continue
+    else:
+        if do_anim != "Y" and do_anim != "N" and do_anim != "y" and do_anim != "n":
+            continue
+        else:
+            break
+
+if do_anim == "Y" or do_anim == "y":
+    anim_gif = 0
+elif do_anim == "N" or do_anim == "n":
+    anim_gif = 1
 
 
 
 #  Evolve in time the initial state
 # ------------------------------------------------------------------------------
 
-# plots wavefunctions and intermediate states if 0
-plots = 0
-
 # checks evolution with imaginary time (comment next line to ignore it)
 # c = evolution(t0, -1j*Dti, z, c0, Vpot_R, V, Ekin_K, 1, plots)
-
-# writes files with the wavefuntion at certain time steps if 0
-write_evolution = 0
 
 # initial kick to the soliton (velocity v)
 psi = psi *np.exp(+1j*v*(z-x0))
@@ -133,3 +185,7 @@ c = evolution(t0, Dtr, z, c0, Vpot_R, V, Ekin_K, write_evolution,plots)
 end = time.time()
 
 print("Time: %g"%(end - start))
+if anim_gif == 0:
+    p = subprocess.Popen("gnuplot animation_gif.gnu", shell = True)
+    os.waitpid(p.pid, 0)
+    print("Animation 'bright_soliton.gif' has been created in the current directory.")
