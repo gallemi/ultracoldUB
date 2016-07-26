@@ -66,7 +66,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         print "(Imaginary time evolution)"
         fn = open('normalization_imag.dat', 'w')
         fe = open('energies_imag.dat', 'w')
-        #fc = open('c_imag.dat', 'w')
         fpsi_all = open('evolution_imag.dat', 'w')
     else:
         print "(Real time evolution)"
@@ -75,7 +74,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
             fe = open('./%s/energies.dat' % dir, 'w')
         else:
             fe = open('energies_real.dat', 'w')
-        #fc = open('c_real.dat', 'w')
         fpsi_all = open('evolution_real.dat', 'w')
 
     # wavefunction and counters
@@ -89,12 +87,16 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     wave_function = np.empty([Ninter+1,3])
 
     # headers and formats for files
-    format_c = "%.2f \t %.12g \t %.12g \t %.12g \n"
-    format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
     fe.write("# %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %("time","total energy","chemical potential","kinetic energy","potential energy","interaction energy", "left integral", "inside integral", "right integral"))
-    header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, xb, wb, hb, energy_cicle[j,1], energy_cicle[j,0]
-    header_format = "# %s"+("\t%s")*5+"\n" + "# Number of particle = %s; scattering length = %s; Grid width = %s; Number of points = %s; Total number of time steps = %s; time step = %s " + "initial position of the soliton = %s; initial velocity of the soliton = %s; position of the barrier = %s; width of the barrier = %s; height of the barrier = %s;" + " results: chemical potential = %s; total energy = %s \n"
     format_psi = "%.2f" + ("\t %.12g")*5 + "\n"
+    if V_ext == 2: # potential barrier
+        format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
+        header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, xb, wb, hb, energy_cicle[j,1], energy_cicle[j,0]
+        header_format = "# %s"+("\t%s")*5+"\n" + "# Number of particle = %s; scattering length = %s; Grid width = %s; Number of points = %s; Total number of time steps = %s; time step = %s " + "initial position of the soliton = %s; initial velocity of the soliton = %s; position of the barrier = %s; width of the barrier = %s; height of the barrier = %s;" + " results: chemical potential = %s; total energy = %s \n"
+    else:
+        format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
+        header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, energy_cicle[j,1], energy_cicle[j,0]
+        header_format = "# %s"+("\t%s")*5+"\n" + "# Number of particle = %s; scattering length = %s; Grid width = %s; Number of points = %s; Total number of time steps = %s; time step = %s " + "initial position of the soliton = %s; initial velocity of the soliton = %s;" + " results: chemical potential = %s; total energy = %s \n"
 
     # energy and time at t0 (prints)
     tevol[0]=t0
@@ -105,10 +107,13 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     # wavefunction
     cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
     psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
-    wave_function[0,:] = list_integrals(np.abs(psi)**2,z)
 
-    # writes initial energies and wavefunction on a file
-    fe.write(format_e %(tevol[0], energy_cicle[0,0], energy_cicle[0,1], energy_cicle[0,2], energy_cicle[0,3], energy_cicle[0,4], wave_function[0,0], wave_function[0,1], wave_function[0,2]))
+    # writes initial energies and wavefunction on a file (if there is a potential barrier)
+    if V_ext == 2:
+        wave_function[0,:] = list_integrals(np.abs(psi)**2,z)
+        fe.write(format_e %(tevol[0], energy_cicle[0,0], energy_cicle[0,1], energy_cicle[0,2], energy_cicle[0,3], energy_cicle[0,4], wave_function[0,0], wave_function[0,1], wave_function[0,2]))
+    else:
+        fe.write(format_e %(tevol[0], energy_cicle[0,0], energy_cicle[0,1], energy_cicle[0,2], energy_cicle[0,3], energy_cicle[0,4]))
 
     # state at t0
     for k in range(0,Npoint-1):
@@ -141,7 +146,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         t += np.abs(Dt)
         psi=ifft(T_K(Dt, Ekin_K)*c)*Npoint
         c=T_K(Dt, Ekin_K)*fft(T_R_psi(t0,Dt,psi,Vpot_R))/Npoint
-        #fc.write(format_c % (t , np.abs(c[int(Npoint/2-0.1*Npoint)]) , np.abs(c[int(Npoint/2)]) , np.abs(c[int(Npoint/2+0.1*Npoint)]))) # write some values of c on a file
         c = normaliza(c,fn); # check norm in the wf
         V = changeFFTposition(Vpot_R,Npoint,0) # in physical order
 
@@ -151,8 +155,11 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
             cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
             psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
             energy_cicle[j,:] = Energy(c, Vpot_R, Ekin_K)
-            wave_function[j,:] = list_integrals(np.abs(psi)**2,z)
-            fe.write(format_e %(tevol[j], energy_cicle[j,0], energy_cicle[j,1], energy_cicle[j,2], energy_cicle[j,3], energy_cicle[j,4], wave_function[j,0], wave_function[j,1], wave_function[j,2]))
+            if V_ext == 2:
+                wave_function[j,:] = list_integrals(np.abs(psi)**2,z)
+                fe.write(format_e %(tevol[j], energy_cicle[j,0], energy_cicle[j,1], energy_cicle[j,2], energy_cicle[j,3], energy_cicle[j,4], wave_function[j,0], wave_function[j,1], wave_function[j,2]))
+            else:
+                fe.write(format_e %(tevol[j], energy_cicle[j,0], energy_cicle[j,1], energy_cicle[j,2], energy_cicle[j,3], energy_cicle[j,4]))
 
             # plots and writes
             if(not(i%100)):
@@ -191,9 +198,10 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         # other plots (for the final state)
         # plot_phase(z,psi,Zmax,t); plt.show()
         # plot_real_imag(z,psi,Zmax,t); plt.show()
-        plot_wave_function(tevol, wave_function); plt.show()
+        if V_ext == 2:
+            plot_wave_function(tevol, wave_function); plt.show()
 
     # closes files
-    fn.close(); fe.close(); fpsi_all.close(); #fc.close()
+    fn.close(); fe.close(); fpsi_all.close()
 
     return c

@@ -57,7 +57,7 @@ print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
 
 print("\nInitial wavefunction parameters:")
 print(" Characteristic interaction energy = %g"%(gint/NormWF))
-print(" Healing length = %g \t %g" %(xi, 1.0 / ( np.abs(gn)**2 * 0.5   )**0.5))
+print(" Healing length = %g" %(xi))
 print(" Position of the soliton = %g"%(x0))
 if wall != 0:
     print(" Height of the walls = %g"%(wall_h))
@@ -66,7 +66,6 @@ if hb != 0.0:
     print(" Height of the potential barrier = %g" %(hb))
     print(" Width of the potential barrier = %g" %(wb*2.0))
 print(" Initial velocity of the soliton = %g \n" %(v))
-
 
 # Grid definitions: physical and momentum space; kinetic energy in K space
 # ------------------------------------------------------------------------------
@@ -89,22 +88,55 @@ psi = changeFFTposition(ifft(c)*Npoint*NormWF**0.5,Npoint,1)
 psi0 = psi
 
 # initial potential
-Vpot_R = Vpot(2, z)
+Vpot_R = Vpot(V_ext, z)
 
+
+# plots and files
+# ------------------------------------------------------------------------------
+
+# plots
+print("Plot wavefunctions and intermediate states?")
+while True:
+    try:
+        do_plt = str(raw_input("\tY/N: "))
+    except ValueError:
+        continue
+    else:
+        if do_plt != "Y" and do_plt != "N" and do_plt != "y" and do_plt != "n":
+            continue
+        else:
+            break
+
+if do_plt == "Y" or do_plt == "y":
+    plots = 0
+elif do_plt == "N" or do_plt == "n":
+    plots = 1
+
+# writes files with the wavefuntion at certain time steps if 0
+print("Write files with the wavefunction at certain time steps?")
+while True:
+    try:
+        do_file = str(raw_input("\tY/N: "))
+    except ValueError:
+        continue
+    else:
+        if do_file != "Y" and do_file != "N" and do_file != "y" and do_file != "n":
+            continue
+        else:
+            break
+
+if do_file == "Y" or do_file == "y":
+    write_evolution = 0
+elif do_file == "N" or do_file == "n":
+    write_evolution = 1
 
 
 
 #  Evolve in time the initial state
 # ------------------------------------------------------------------------------
 
-# plots wavefunctions and intermediate states if 0
-plots = 0
-
 # checks evolution with imaginary time (comment next line to ignore it)
 # c = evolution(t0, -1j*Dti, z, c0, Vpot_R, V, Ekin_K, 1, plots)
-
-# writes files with the wavefuntion at certain time steps if 0
-write_evolution = 0
 
 # initial kick to the soliton (velocity v)
 psi = psi *np.exp(+1j*v*(z-x0))
