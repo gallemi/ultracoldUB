@@ -38,9 +38,7 @@
 
 - Hacer un pull request con los cambios (desde la web).
 
------------------------------------
-
-- Volver a actualizar el repositorio local y eliminar la rama (local):
+- Volver a actualizar el repositorio local (master branch) y eliminar la rama (local):
 
       $ git pull upstream master
       $ git branch -d [name_of_your_new_branch]
