@@ -136,23 +136,23 @@ elif do_file == "N" or do_file == "n":
     write_evolution = 1
 
 # plots animation of the evolution
-print("Do an animation of the evolution?")
-while True:
-    try:
-        do_anim = str(raw_input("\tY/N: "))
-    except ValueError:
-        continue
-    else:
-        if do_anim != "Y" and do_anim != "N" and do_anim != "y" and do_anim != "n":
+if write_evolution == 0:
+    print("Do an animation of the evolution?")
+    while True:
+        try:
+            do_anim = str(raw_input("\tY/N: "))
+        except ValueError:
             continue
         else:
-            break
+            if do_anim != "Y" and do_anim != "N" and do_anim != "y" and do_anim != "n":
+                continue
+            else:
+                break
 
-if do_anim == "Y" or do_anim == "y":
-    anim_gif = 0
-elif do_anim == "N" or do_anim == "n":
-    anim_gif = 1
-
+    if do_anim == "Y" or do_anim == "y":
+        anim_gif = 0
+    elif do_anim == "N" or do_anim == "n":
+        anim_gif = 1
 
 
 #  Evolve in time the initial state
@@ -185,7 +185,8 @@ c = evolution(t0, Dtr, z, c0, Vpot_R, V, Ekin_K, write_evolution,plots)
 end = time.time()
 
 print("Time: %g"%(end - start))
-if anim_gif == 0:
+
+if write_evolution == 0 and anim_gif == 0:
     p = subprocess.Popen("gnuplot animation_gif.gnu", shell = True)
     os.waitpid(p.pid, 0)
     print("Animation 'bright_soliton.gif' has been created in the current directory.")

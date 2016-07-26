@@ -51,7 +51,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     global Ntime_out, Ntime_fin, gint, Npoint, NormWF, Zmax, Nparticle, a_s, x0, v, whoz, xb, wb, hb, wall_h, wall
     # where the files of evolution will be saved
     if (write_ev==0):
-        dir = "bs-gn_%0d-v_%0d-hb_%0d-wb_%0d" % (np.abs(gn)*10, np.abs(v), np.abs(hb), np.abs(wb)) # name of directory
+        dir = "bs_evolution" # name of the directory
+        ## dir = "bs-gn_%0d-v_%0d-hb_%0d-wb_%0d" % (np.abs(gn)*10, np.abs(v), np.abs(hb), np.abs(wb)) # name of directory (old)
         name = "WfBs" # general name of the files
         if (not os.path.exists(dir)): # creates the directory
             os.makedirs(dir)
@@ -68,9 +69,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
                     else:
                         break
             if (ans == 'N' or ans == 'n'):
-                sys.exit("End of program")            
-                
-            
+                sys.exit("End of program")
+
             files = "%s/%s_*.dat" % (dir, name)
             for f in glob.glob(files):
                 os.remove( f )
@@ -80,7 +80,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         print "(Imaginary time evolution)"
         fn = open('normalization_imag.dat', 'w')
         fe = open('energies_imag.dat', 'w')
-        fpsi_all = open('evolution_imag.dat', 'w')
     else:
         print "(Real time evolution)"
         fn = open('normalization_real.dat', 'w')
@@ -88,7 +87,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
             fe = open('./%s/energies.dat' % dir, 'w')
         else:
             fe = open('energies_real.dat', 'w')
-        fpsi_all = open('evolution_real.dat', 'w')
 
     # wavefunction and counters
     Ninter = Ntime_fin//Ntime_out # number of outputs (intermediate states)
@@ -101,7 +99,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     wave_function = np.empty([Ninter+1,3])
 
     # headers and formats for files
-    format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
     fe.write("# %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %("time","total energy","chemical potential","kinetic energy","potential energy","interaction energy", "left integral", "inside integral", "right integral"))
     format_psi = "%.2f" + ("\t %.12g")*5 + "\n"
     if V_ext == 2: # potential barrier
@@ -130,12 +127,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     else:
         fe.write(format_e %(tevol[0], energy_cicle[0,0], energy_cicle[0,1], energy_cicle[0,2], energy_cicle[0,3], energy_cicle[0,4]))
 
-    # state at t0
-    for k in range(0,Npoint-1):
-        fpsi_all.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k]))
-
     # plots initial state and prepares plot of intermediate states
-    if(plots==0):
+    if (plots==0):
         f4=plt.figure()
         if isinstance(Dt, complex):
             plt.title('Evolution of the initial wavefunction (imaginary time)',fontsize=15)
@@ -178,10 +171,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
 
             # plots and writes
             if(not(i%100)):
-                # file for the animation with gnuplot
-                for k in range(0,Npoint-1):
-                    fpsi_all.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k]))
-                fpsi_all.write("\n \n")
 
                 # plots density
                 if(plots==0):
@@ -193,7 +182,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
 
                 # writes a file for each timestep
                 if(write_ev==0):
-                    fpsi = open('./%s/%s-%08d.dat' %(dir,name,tevol[j]*1000), 'w')
+                    fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
                     fpsi.write(header_format %(header_variables))
                     format_psi = "%.2f" + ("\t %.12g")*5 + "\n"
                     for k in range(0,Npoint-1):
@@ -211,12 +200,12 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     if(plots==0):
         plot_convergence(tevol,energy_cicle,Ninter); plt.show()
         # other plots (for the final state)
-        # plot_phase(z,psi,Zmax,t); plt.show()
+        # plot_phase(z,psi,Zmax,t); plt.show()
         # plot_real_imag(z,psi,Zmax,t); plt.show()
         if V_ext == 2:
             plot_wave_function(tevol, wave_function); plt.show()
 
     # closes files
-    fn.close(); fe.close(); fpsi_all.close()
+    fn.close(); fe.close()
 
     return c
