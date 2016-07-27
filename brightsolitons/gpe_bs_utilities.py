@@ -46,9 +46,20 @@ def Vpot(n, z):
     Vpot_R = np.empty([Npoint]) # vector of the same length as z, initially empty
     m = 1000                    # slope used to define the walls and barrier
     wall_x = 0.75*Zmax          # position of the walls relative to the halfwidth of the box
+    tol_exp = 1e100; tol_arg = 500
     # defines the walls of the box
     if wall != 0 :
-        Vpot_R = wall_h - wall_h/(1.0+np.exp(m*(z-wall_x))) + wall_h/(1.0+np.exp(m*(z+wall_x)))
+        Vpot_R = 0.0*z
+        for i in range(0,Npoint):
+            if m*(z[i]-wall_x) > tol_arg:
+                wall_exp1 = tol_exp
+            else:
+                wall_exp1 = np.exp(m*(z[i]-wall_x))
+            if m*(z[i]+wall_x) > tol_arg:
+                wall_exp2 = tol_exp
+            else:
+                wall_exp2 = np.exp(m*(z[i]+wall_x))
+            Vpot_R[i] = wall_h - wall_h/(1.0+wall_exp1) + wall_h/(1.0+wall_exp2)
     else:
         Vpot_R = 0.0*z
     # defines the potential (barriers, harmonic trap, etc.)
@@ -57,7 +68,17 @@ def Vpot(n, z):
     elif(n==1):
         Vpot_R = 0.5*whoz**2*z**2
     elif(n==2):
-        Vpot_R = Vpot_R + hb/(1.0+np.exp(m*(z-xbr))) - hb/(1.0+np.exp(m*(z-xbl)))
+        Vpot_R = 0.0*z
+        for i in range(0,Npoint):
+            if m*(z[i]-xbr) > tol_arg:
+                barrier_exp1 = tol_exp
+            else:
+                barrier_exp1 = np.exp(m*(z[i]-xbr))
+            if m*(z[i]-xbl) > tol_arg:
+                barrier_exp2 = tol_exp
+            else:
+                barrier_exp2 = np.exp(m*(z[i]-xbl))
+            Vpot_R[i] = Vpot_R[i] + hb/(1.0+barrier_exp1) - hb/(1.0+barrier_exp2)
     else:
         Vpot_R = Vpot_R
     return Vpot_R
