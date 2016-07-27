@@ -57,10 +57,10 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
         if (not os.path.exists(dir)): # creates the directory
             os.makedirs(dir)
         else: # removes its contents if it already exists
-            print "Directory %r already exists." % (dir)
+            print "Directory %r already exists. Do you want to continue?" % (dir)
             while True:
                 try:
-                    ans = str(raw_input("\t Do you want to continue? (Y/N): ")) # pause, answer to continue
+                    ans = str(raw_input("\tY/N: ")) # pause, answer to continue
                 except ValueError:
                     continue
                 else:
@@ -71,8 +71,11 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
             if (ans == 'N' or ans == 'n'):
                 sys.exit("End of program")
 
-            files = "%s/%s_*.dat" % (dir, name)
-            for f in glob.glob(files):
+            files_evolution = "%s/%s-*.dat" % (dir, name)
+            files_energies = "%s/energies.dat" % (dir)
+            for f in glob.glob(files_evolution):
+                os.remove( f )
+            for f in glob.glob(files_energies):
                 os.remove( f )
 
     # open files for normalization, energies, and some values of c
