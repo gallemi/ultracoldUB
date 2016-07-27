@@ -129,7 +129,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
 
     # plots initial state and prepares plot of intermediate states
     if (plots==0):
-        f4=plt.figure()
+        f1=plt.figure()
         if isinstance(Dt, complex):
             plt.title('Evolution of the initial wavefunction (imaginary time)',fontsize=15)
         else:
@@ -193,17 +193,16 @@ def evolution(t0, Dt, z, c0, Vpot_R, V, Ekin_K, write_ev, plots):
     print("         final   = %g %g %g %g %g"%(Energy(c, Vpot_R, Ekin_K)))
     print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
     print("  E(final) - E(initial) = %g"%(np.abs(energy_cicle[Ninter,0]-energy_cicle[0,0])))
-    if(plots==0):
-        f4.show(); plt.show()
 
-    # plots energies, density, and % in time
+    # plots intermediate states, energies, density, and % in time
     if(plots==0):
-        plot_convergence(tevol,energy_cicle,Ninter); plt.show()
-        # other plots (for the final state)
-        # plot_phase(z,psi,Zmax,t); plt.show()
-        # plot_real_imag(z,psi,Zmax,t); plt.show()
+        f1.show()
+        plot_convergence(tevol,energy_cicle,Ninter)
+        # plot_phase(z,psi,Zmax,t)
+        # plot_real_imag(z,psi,Zmax,t)
         if V_ext == 2:
-            plot_wave_function(tevol, wave_function); plt.show()
+            plot_wave_function(tevol, wave_function)
+        plt.show()
 
     # closes files
     fn.close(); fe.close()
