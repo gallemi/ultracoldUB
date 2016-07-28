@@ -1,7 +1,6 @@
 # coding: utf-8
 import matplotlib.pyplot as plt
 import numpy as np
-from gpe_bs_parameters import *
 
 
 def plot_convergence(x,y,n):
