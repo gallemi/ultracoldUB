@@ -1,9 +1,8 @@
 do for [l=0:20000:100]{
 k=sprintf('%08d.dat',l)
 
-a=l/1000
+a=l/1000.0
 set title sprintf("Bright soliton (t=%2.1f)",a)
-#set title ("Bright soliton")
 set xrange[-128:128]
 set yrange[-0:0.3]
 set xlabel "x"
