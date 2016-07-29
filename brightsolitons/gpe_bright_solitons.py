@@ -169,7 +169,7 @@ c0 = c # initial wavefunction for the dynamic evolution (used in the animation)
 
 # saves the initial wavefunction (psi**2) and potential on a file
 fv = open('initial.dat', 'w')
-format_v = "%.2f \t %.2f \t %.12g \n"
+format_v = "%.2f \t %.4f \t %.12g \n"
 for i in range(0,Npoint-1):
     fv.write(format_v %(z[i],Vpot_R[i],np.abs(psi[i])**2))
 fv.close()
