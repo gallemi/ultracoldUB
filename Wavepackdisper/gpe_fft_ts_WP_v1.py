@@ -204,11 +204,10 @@ def normaliza(c): # normalization to 1
 # In[9]:
 
 t=0.0
-c=normaliza(gaussian(zp,Npoint,x0,0,0.5,0.0))
+c=normaliza(gaussian(zp,Npoint,x0,0,1.0,0.0))
 cc = ifft(c)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
 psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 
-psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
 #plot different propieties of psi:
 
 plot_density(z,psi,Zmax,t)
