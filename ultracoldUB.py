@@ -88,12 +88,12 @@ case=Demain.name
 if int(case) == 1:
     print("Wavepacket dispersion")
     with cd('./Wavepackdisper'):
-        os.system('python gpe_fft_ts_WP_v1.py')
+        os.system('python'+version+' gpe_fft_ts_WP_v1.py')
 
 elif int(case) == 2:
     print("Dark solitons")
     with cd('./darksolitons'):
-        os.system('python gpe_fft_ts_DS_v1.py')
+        os.system('python'+version+' gpe_fft_ts_DS_v1.py')
 
 elif int(case) == 3:
     print("Bright solitons")
