@@ -44,7 +44,14 @@ from gpe_fft_utilities import * # local folder utilities
 import numpy.linalg as lin
 from pylab import*
 import os, glob
-
+try:
+    from tkinter import *  
+    from tkinter import ttk
+    v3=True
+except ImportError:
+    from Tkinter import *
+    import ttk
+    v3=False
 close('all')
 pi=np.pi
 
@@ -67,15 +74,99 @@ Dti = 1.0e-3             # imaginary time step
 
 # We choose the initial position of soliton:
 
-while True:
-    try:
-        x0=float(raw_input("introduce posicion inicial del soliton de 0 a 6"))
-        while (np.abs(x0)>(6)): # tolerance for the initial position of the soliton
-            print "ERROR: el soliton debe estar dentro del rango de 0 a 6"
-            x0=float(raw_input("introduce posicion inicial del soliton"))
-        break
-    except ValueError:
-        print("Escribe un numero")
+
+
+class Demodark:
+    def __init__(self,master,v3):
+        self.name1=""
+        self.name2=""
+        self.master=master
+        self.v3=v3
+        frame=Frame(self.master)
+        frame.pack()
+        self.t_name1=DoubleVar()
+        self.t_name2=DoubleVar()
+        nb = ttk.Notebook(rootdark)
+        page1 = ttk.Frame(nb)
+        page2 = ttk.Frame(nb)        
+        nb.add(page1, text='Programa')
+        nb.add(page2, text='Notas')
+        nb.pack(expand=1, fill="both")
+        if self.v3==True:
+            label1 = Label(page1, text="Posicion del soliton", background="black", foreground="white",font = "Verdana 16 bold")
+            label1.pack(fill=X)
+            bar1 = Scale(page1, from_=-6, to=6, variable=self.t_name1, length=600,tickinterval=2, resolution=0.1, orient=HORIZONTAL) 
+            bar1.set(0)
+            bar1.configure(bg='black',fg='white')
+            bar1.pack(pady=10)
+            label2 = Label(page1, text="Numero de oscilaciones", background="black", foreground="white",font = "Verdana 16 bold")
+            label2.pack(fill=X)
+            bar2 = Scale(page1, from_=1, to=10, variable=self.t_name2, length=600,tickinterval=3, resolution=1, orient=HORIZONTAL) 
+            bar2.set(1)
+            bar2.configure(bg='black',fg='white')
+            bar2.pack()
+        else:
+            label1 = Label(page1, text="Posicion del soliton", background="black", foreground="white",font = "Verdana 16 bold")
+            label1.pack(fill=X)
+            bar1 = ttk.Scale(page1, from_=-6, to=6, variable=self.t_name1, length=600, orient=HORIZONTAL) 
+            bar1.set(0)
+            bar1.pack(pady=10)
+            label2 = Label(page1, text="Numero de oscilaciones", background="black", foreground="white",font = "Verdana 16 bold")
+            label2.pack(fill=X)
+            bar2 = ttk.Scale(page1, from_=1, to=10, variable=self.t_name2, length=600, orient=HORIZONTAL) 
+            bar2.set(1)
+            bar2.pack()
+        self.button=Button(page1, text='OK', command=self.show_values).pack()
+        
+        text2 = Text(page2, height=15, width=70)
+  #      scroll = Scrollbar(root, command=text2.yview)
+#        text2.configure(yscrollcommand=scroll.set)
+        text2.tag_configure('bold_italics', font=('Arial', 12, 'bold', 'italic'))
+        text2.tag_configure('big', font=('Verdana', 20, 'bold'))
+        text2.tag_configure('color', foreground='#476042', 
+						font=('Tempus Sans ITC', 12, 'bold'))
+  #      text2.tag_bind('follow', '<1>', lambda e, t=text2: t.insert(END, "Not now, maybe later!"))
+        text2.insert(END,'\nWilliam Shakespeare\n', 'big')
+        quote = """
+        To be, or not to be that is the question:
+        Whether 'tis Nobler in the mind to suffer
+        The Slings and Arrows of outrageous Fortune,
+        Or to take Arms against a Sea of troubles,
+        """
+        text2.insert(END, quote, 'color')        
+        text2.pack(side=LEFT)
+        
+   #     s = Separator(frame, orient=HORIZONTAL)
+   #     s.set(0)
+
+
+    def show_values(self):
+        self.name1= (self.t_name1.get())
+        self.name2= (self.t_name2.get())
+        rootdark.destroy()
+        
+rootdark = Tk()
+rootdark.wm_title("Dark solitons")
+Dedark=Demodark(rootdark,v3)
+rootdark.mainloop()
+
+
+x0=Dedark.name1
+osci=float(int(Dedark.name2))
+
+
+
+
+
+#while True:
+#    try:
+#        x0=float(raw_input("introduce posicion inicial del soliton de 0 a 6"))
+#        while (np.abs(x0)>(6)): # tolerance for the initial position of the soliton
+#            print "ERROR: el soliton debe estar dentro del rango de 0 a 6"
+#            x0=float(raw_input("introduce posicion inicial del soliton"))
+#        break
+#    except ValueError:
+#        print("Escribe un numero")
 
 # Print evolution data:
 
@@ -236,15 +327,15 @@ plot_real_imag(z,psi,Zmax,t)
 
 psi_sol=psi                  # we chance name variable
 # User decide the oscilation number
-while True:
-    try:
-        osci =float(raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 1 y 10'))
-        while ((osci<1) or (osci>10)):
-            print "ERROR: las oscilaciones deben de estar entre un rango de 1 y 10"
-            osci=float(raw_input("introduce el numero de oscilaciones que quieres que de el soliton"))
-        break
-    except ValueError:
-        print("Escribe un numero")
+#while True:
+#    try:
+#        osci =float(raw_input('introduce el numero de oscilaciones que quieres que de el soliton entre 1 y 10'))
+#        while ((osci<1) or (osci>10)):
+#            print "ERROR: las oscilaciones deben de estar entre un rango de 1 y 10"
+#            osci=float(raw_input("introduce el numero de oscilaciones que quieres que de el soliton"))
+#        break
+#    except ValueError:
+#        print("Escribe un numero")
 
 
 Ntime_fin=int(osci*8800)     # total number of time steps
@@ -282,10 +373,13 @@ dir = "ds_evolution" # name of the directory
 if (not os.path.exists(dir)): # creates the directory
     os.makedirs(dir)
 else: # removes its contents if it already exists
-    print "Directory %r already exists. Do you want to continue?" % (dir)
+    print ("Directory %r already exists. Do you want to continue?" % (dir))
     while True:
         try:
-            ans = str(raw_input("\tY/N: ")) # pause, answer to continue
+            if v3==True:
+                ans = str(input("\tY/N: ")) # pause, answer to continue
+            else:
+                ans = str(raw_input("\tY/N: ")) # pause, answer to continue
         except ValueError:
             continue
         else:
