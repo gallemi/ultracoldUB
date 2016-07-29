@@ -47,15 +47,18 @@
 
 - Volver a actualizar el repositorio local (master branch) y eliminar la rama (local):
 
-$ git pull upstream master
-$ git branch -d [name_of_your_new_branch]
+      $ git pull upstream master
+
+      $ git branch -d [name_of_your_new_branch]
 
 - Actualizar de nuevo a `master` branch del repositorio local:
 
-$ git push origin master
-$ git push --delete origin [name_of_your_new_branch]
+      $ git push origin master
+
+      $ git push --delete origin [name_of_your_new_branch]
 
 **Notas**:
 
-$ git branch # para ver las branches
-$ git checkout [branch] # cambiar a otra rama
+      $ git branch # para ver las branches
+      
+      $ git checkout [branch] # cambiar a otra rama
